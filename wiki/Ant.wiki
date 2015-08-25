@@ -1,0 +1,12 @@
+_[http://code.google.com/p/zongcheng 回到主页]_
+
+==Ant的安装==
+1. 下载最新版本Ant,目前是1.7 http://ant.apache.org/bindownload.cgi
+<br/>
+2. 解压缩Ant到任意目录, 例如 C:\Ant
+<br/>
+3. 配置环境变量
+    * 右键"我的电脑" -> "属性" -> 选择"高级"选项卡 -> 点击"环境变量" 
+    * 在系统变量中，点击"新建" -> 变量名=ANT_HOME, 变量值=C:\Ant(安装根目录) 
+    * 选择"PATH" -> 点击修改 -> 在原有变量值前添加.;%ANT_HOME%\bin 
+    * 点击确定

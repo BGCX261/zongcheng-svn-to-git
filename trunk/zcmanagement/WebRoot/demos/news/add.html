@@ -1,0 +1,146 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312">
+<title>新闻管理 - 添加新闻</title>
+<link href="../../css/common.css" rel="stylesheet" type="text/css">
+</head>
+
+<body>
+<div id="menu">
+  <div id="menu_box">
+  <a href="index.html" class="m_on">新闻管理</a>
+  </div>
+</div>
+
+<div id="main">
+  <div class="block1">
+    <div class="block_text"><a href="index.html">&lt;&lt; 返回新闻列表</a></div>
+  </div>
+  <form action="info.html">
+  <table border="0" cellspacing="0" cellpadding="0" class="detail_tb">
+    <tr>
+      <td class="c_title">新闻时间</td>
+      <td><label>
+        <select name="select">
+          <option>请选择</option>
+          <option>1998</option>
+          <option>1999</option>
+          <option>2000</option>
+          <option>2001</option>
+          <option>2002</option>
+          <option>2003</option>
+          <option>2004</option>
+          <option>2005</option>
+          <option>2006</option>
+          <option>2007</option>
+        </select>
+      </label>
+        年
+        <label>
+        <select name="select2">
+          <option>请选择</option>
+          <option>1</option>
+          <option>2</option>
+          <option>3</option>
+          <option>4</option>
+          <option>5</option>
+          <option>6</option>
+          <option>7</option>
+          <option>8</option>
+          <option>9</option>
+          <option>10</option>
+          <option>11</option>
+          <option>12</option>
+        </select>
+        </label>
+        月
+        <label>
+        <select name="select3">
+          <option>请选择</option>
+          <option>1</option>
+          <option>2</option>
+          <option>3</option>
+          <option>4</option>
+          <option>5</option>
+          <option>6</option>
+          <option>7</option>
+          <option>8</option>
+          <option>9</option>
+          <option>10</option>
+          <option>11</option>
+          <option>12</option>
+          <option>13</option>
+          <option>14</option>
+          <option>15</option>
+          <option>16</option>
+          <option>17</option>
+          <option>18</option>
+          <option>19</option>
+          <option>20</option>
+          <option>21</option>
+          <option>22</option>
+          <option>23</option>
+          <option>24</option>
+          <option>25</option>
+          <option>26</option>
+          <option>27</option>
+          <option>28</option>
+          <option>29</option>
+          <option>30</option>
+          <option>31</option>
+        </select>
+        </label>
+        <br>
+        <span class="c_lgreen">系统默认是按照发布时间自动归类新闻，如果需要，您也可以在这里给新闻指定一个时间。<br>
+        例如这条新闻是06年5月3日的事情，而今天才发布。您想指定这条新闻到06年5月3日，那么在这里输入便可</span></td>
+    </tr>
+    <tr>
+      <td class="c_title">新闻标题</td>
+      <td><input name="textfield" type="text" size="50"> 
+        <span class="c_red">*</span> </td>
+    </tr>
+    <tr>
+      <td class="c_title">新闻内容</td>
+      <td><textarea name="textarea" cols="100" rows="12"></textarea>
+        <span class="c_red">*</span></td>
+    </tr>
+    <tr>
+      <td class="c_title">图片1</td>
+      <td>
+	    <input type="text" name="textfield2">
+		<button>浏览...</button>
+		<button>删除</button><!--如果已经有上传图片，就出现删除按钮，否则不出现-->
+	  </td>
+    </tr>
+    <tr>
+      <td class="c_title">图片2</td>
+      <td><input type="text" name="textfield22"><button>浏览...</button></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td>
+	    <!--照片预览
+		注：上传照片所存放的路经在根目录下的_img/news_photos/里面，你可以使用新闻的id来命名。
+		例如这条新闻的id为“001”，你就可以命名这条新闻的两张图片为"001_1.jpg"和"001_2.jpg"。当然你也可以自己决定：）
+		-->
+		<div class="prev_set">
+		  <img src="../../../site/_img/news_photos/tmp1.jpg">
+		  <img src="../../../site/_img/news_photos/tmp2.jpg">
+		</div>
+		<!--照片预览结束-->
+	  </td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td><div class="confirm_c"><button type="submit">添加新闻</button></div></td>
+    </tr>
+  </table>
+  </form>
+</div>
+<div id="f_blank"></div>
+<div id="f_line"></div>
+<div id="f_exit"><a href="../index.html" class="As">退出管理系统</a></div>
+</body>
+</html>

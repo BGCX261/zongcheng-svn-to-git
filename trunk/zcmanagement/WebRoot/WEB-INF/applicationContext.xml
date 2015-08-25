@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.5.xsd">
+
+<!-- Define DataSource -->
+<bean id="dataSource" 
+	class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+	<property name="url" value="jdbc:jtds:sqlserver://localhost:1433/zongcheng" />
+	<property name="driverClassName" value="net.sourceforge.jtds.jdbc.Driver" />
+	<property name="username" value="sa"/>
+	<property name="password" value="sa"/>
+</bean>
+
+<!-- Define Transaction Manager -->
+<bean id="dataSourceTransationManager" 
+	class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+	<property name="dataSource" ref="dataSource"/>
+</bean>
+
+<bean id="baseTransactionProxy" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean" 
+	abstract="true">
+	<property name="transactionManager" value="dataSourceTransationManager"/>
+	<property name="transactionAttributes">
+		<props>
+			<prop key="find*">PROPAGATION_SUPPORTS,readOnly</prop>
+			<prop key="get*">PROPAGATION_SUPPORTS,readOnly</prop>
+			<prop key="save*">PROPAGATION_REQUIRED</prop>
+			<prop key="update*">PROPAGATION_REQUIRED</prop>
+			<prop key="delete*">PROPAGATION_REQUIRED</prop>
+		</props>
+	</property>
+</bean>
+
+<!-- Support Ibatis SqlMapClient -->
+<bean id="sqlMapClient" 
+	class="org.springframework.orm.ibatis.SqlMapClientFactoryBean">
+	<property name="configLocation">
+		<value>classpath:conf/sqlMapConfig.xml</value>
+	</property> 
+	<property name="dataSource" ref="dataSource" />
+</bean>
+
+<!-- Dao Definition -->
+<import resource="conf/daoContext.xml"/>      
+      
+<!-- Service Definition -->
+<import resource="conf/serviceContext.xml"/>
+
+<!-- Action Definition -->
+<import resource="conf/actionContext.xml"/>
+
+</beans>

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- First Ant Builder XML -->
+<project name="mywms" basedir=".">
+	<description>Easy Ant Builder XML Example</description>
+	
+	<!-- 全局变量 -->
+	<property file="${user.home}/build.properties" />
+	
+	<property name="pro.home" 		value="." /> 							<!-- 项目根目录 -->
+	<property name="src.dir"  		value="${pro.home}/src" /> 				<!-- Java源文件 -->
+	<property name="web.dir"  		value="${pro.home}/WebRoot" /> 			<!-- web源文件 -->	
+	<property name="lib.dir"		value="${web.dir}/WEB-INF/lib" />		<!-- jar目录 -->
+	<property name="classes.dir"	value="${web.dir}/WEB-INF/classes"/>	<!-- class目录 -->	
+	<property name="build.dir" 		value="${pro.home}/target" />			<!-- 编译根目录 -->		
+	<property name="tomcat.home" 	value="C:/Tomcat" />			    	<!-- tomcat根目录 -->
+	<property name="tomcat.webapps" value="${tomcat.home}/webapps" /> 		<!-- 项目部署目录 -->
+	<property name="app.name"		value="zcmanagement" />					<!-- 项目名称 -->
+	
+	<path id="compile.classpath">
+		<pathelement location="${classes.dir}" />
+		<!-- 需要的本地jar文件 -->
+		<fileset dir="${lib.dir}">
+			<include name="*.jar" />
+			<include name="*.zip" />
+		</fileset>	
+		<!-- 需要的tomcat的jar文件 -->
+		<fileset dir="${tomcat.home}/lib">
+			<include name="*.jar" />
+		</fileset>
+	</path>
+	
+	<!-- 准备，先删除编译根目录，然后创建编译根目录和Classes文件目录 -->
+	<target name="prepare">
+		<delete dir="${build.dir}" />
+		<delete dir="${classes.dir}" />
+		<mkdir  dir="${classes.dir}" />
+		<mkdir  dir="${build.dir}" />
+	</target>
+	
+	<!-- 编译项目 -->
+	<target name="compile" depends="prepare">
+		<javac srcdir="${src.dir}" destdir="${classes.dir}" debug="on" >
+			<classpath refid="compile.classpath"/>
+		</javac>
+	</target>
+	
+	<!-- 复制项目 -->
+	<target name="copy" depends="compile">
+		<copy todir="${classes.dir}">
+			<fileset dir="${src.dir}">
+				<include name="**/*.properties"/>
+				<include name="**/*.prop" />
+				<include name="**/*.xml"/>
+			</fileset>
+		</copy>	
+	
+		<copy todir="${build.dir}">
+			<fileset dir="${web.dir}">
+				<exclude name="**/*.uml"/>
+				<exclude name="**/*.html"/>
+			</fileset>
+		</copy>
+	</target>
+	
+	<!-- 构建项目 -->
+	<target name="build" depends="copy">
+		<jar jarfile="${build.dir}/${app.name}.war" basedir="${build.dir}"/>
+	</target>
+	
+	<!-- 部署项目 -->
+	<target name="deploy" depends="build">
+		<copy todir="${tomcat.webapps}"  file="${build.dir}/${app.name}.war" />
+		<delete dir="${build.dir}" />
+		<delete dir="${classes.dir}" />
+	</target>
+</project>

@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+    
+<sqlMap namespace="Contact">
+	<typeAlias alias="contact" type="com.zcmng.models.Contact"/>
+	
+	<resultMap class="contact" id="contactResult">
+	  <result property="id" column="id"/>
+	  <result property="loginId" column="loginId"/>
+	  <result property="loginPwd" column="loginPwd"/>
+	  <result property="userName" column="userName"/>
+	  <result property="createDate" column="createDate"/>
+	</resultMap>
+	
+	<!-- Define Cache -->
+	<cacheModel type="OSCACHE" id="contactCache">
+	  <flushInterval hours="12"/>
+	  <flushOnExecute statement="Contact.insert"/>
+	  <flushOnExecute statement="Contact.update"/>
+	  <flushOnExecute statement="Contact.delete"/>
+	  <flushOnExecute statement="Contact.deleteContactByIds"/>
+	</cacheModel>		
+	
+	<!-- Insert method -->
+    <insert id="insert" parameterClass="contact">
+    	<![CDATA[ 
+   		INSERT INTO contact 
+	  	(   loginId,
+	   		loginPwd,
+	   		userName )
+   		VALUES (#loginId,jdbcType=VARCHAR#,
+	   		#loginPwd,jdbcType=VARCHAR#,
+	   		#userName,jdbcType=VARCHAR# )    	
+    	]]>
+    	<selectKey resultClass="int" keyProperty="id">
+	     	<![CDATA[ 
+			SELECT @@IDENTITY AS ID 
+	    	]]>   	
+    	</selectKey>
+	</insert>	
+	
+	<!-- Update method -->
+	<update id="update" parameterClass="contact">
+		<![CDATA[
+		UPDATE contact SET modifyDate = getDate()
+		]]>
+		<isNotEmpty property="loginId" prepend=",">
+		  loginId = #loginId,jdbcType=VARCHAR#
+		</isNotEmpty>
+		<isNotEmpty property="loginPwd" prepend=",">
+		  loginPwd = #loginPwd,jdbcType=VARCHAR#
+		</isNotEmpty>
+		<isNotEmpty property="userName" prepend=",">
+		  userName = #userName,jdbcType=VARCHAR#
+		</isNotEmpty>
+		<isNotEqual property="disable" compareValue="0" prepend=",">
+		  disable = #disable,jdbcType=NUMERIC#
+		</isNotEqual>
+		WHERE id = #id,jdbcType=NUMERIC#	
+	</update>
+	
+	<!-- Delete method -->
+	<delete id="delete" parameterClass="contact">
+		<![CDATA[
+		DELETE FROM contact WHERE id = #id,jdbcType=NUMERIC#
+		]]>
+	</delete>
+	
+	<!-- Delete method -->
+	<delete id="deleteContactByIds" parameterClass="map">
+		<![CDATA[
+		update contact SET disable = 1 
+		]]>
+		<dynamic prepend="WHERE">
+			<isNotEmpty property="contactIds">
+				id in 
+				<iterate conjunction="," open="(" close=")" property="contactIds">
+					#contactIds[]#
+				</iterate>
+			</isNotEmpty>
+		</dynamic>
+	</delete>	
+	
+	<!-- Find contact by Id -->
+	<select id="findContactById" resultMap="contactResult" parameterClass="int" cacheModel="contactCache">
+		<![CDATA[
+		SELECT u.id, u.loginId, u.loginPwd, u.userName, u.createDate, u.modifyDate 
+		FROM contact u WHERE u.id = #value#
+		]]>		
+	</select>	
+	
+	<!-- Find contact by loginId and password -->
+	<select id="findContactByIdAndPwd" resultMap="contactResult" parameterClass="map" cacheModel="contactCache">
+		<![CDATA[
+		SELECT u.id, u.loginId, u.loginPwd, u.userName, u.createDate, u.modifyDate 
+		FROM contact u 
+		WHERE u.loginId = #loginId,jdbcType=VARCHAR# 
+		AND u.loginPwd = #loginPwd,jdbcType=VARCHAR#
+		AND u.disable = 0
+		]]>		
+	</select>	
+	
+	<!-- Find contact by conditions -->
+	<select id="findContactsByCondition" resultMap="contactResult" parameterClass="map" cacheModel="contactCache">
+		<![CDATA[
+		SELECT *
+		FROM (
+		  SELECT ROW_NUMBER() OVER (ORDER BY id) AS RowNumber, * 
+		  FROM (		
+		    SELECT u.id, u.loginId, u.loginPwd, u.userName, u.createDate, u.modifyDate 
+		      FROM contact u 
+		     WHERE u.disable = 0		  
+		]]>	
+		<dynamic>
+			<isNotEmpty property="loginId" prepend="AND">
+			  u.loginId = #loginId,jdbcType=VARCHAR#
+			</isNotEmpty>
+			<isNotEmpty property="loginPwd" prepend="AND">
+			  u.loginPwd = #loginPwd,jdbcType=VARCHAR#
+			</isNotEmpty>
+			<isNotEmpty property="userName" prepend="AND">
+			  u.userName like '%$userName$%'
+			</isNotEmpty>
+		</dynamic>	
+		<![CDATA[	
+		    ) temp
+		  ) pageTable
+		  WHERE RowNumber between #pageStart,jdbcType=NUMERIC# and #pageEnd,jdbcType=NUMERIC#
+		]]>		
+	</select>	
+	
+    <!-- Get contacts count For Pagination -->
+    <select id="getContactCountByConditions" resultClass="int" parameterClass="map" cacheModel="contactCache">
+ 		<![CDATA[
+		SELECT count(*) as value FROM contact WHERE disable = 0
+		]]>	
+		<dynamic>
+			<isNotEmpty property="loginId" prepend="AND">
+			  loginId = #loginId,jdbcType=VARCHAR#
+			</isNotEmpty>
+			<isNotEmpty property="loginPwd" prepend="AND">
+			  loginPwd = #loginPwd,jdbcType=VARCHAR#
+			</isNotEmpty>
+			<isNotEmpty property="userName" prepend="AND">
+			  userName like '%$userName$%'
+			</isNotEmpty>
+		</dynamic>	   
+    </select>
+    
+    <select id="getContactCountByLoginId" resultClass="int" parameterClass="string" cacheModel="contactCache">
+ 		<![CDATA[
+		SELECT count(*) as value FROM contact WHERE loginId = #value# AND disable = 0
+		]]>	    
+    </select>			
+	
+</sqlMap>

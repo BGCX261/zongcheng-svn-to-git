@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.1.7//EN"
+    "http://struts.apache.org/dtds/struts-2.1.7.dtd">
+
+<struts>
+  
+  <!-- Define i18n resource -->
+  <constant name="struts.custom.i18n.resources" value="zongcheng" />
+  
+  <!-- Generate simple struts tags without "TR" and "TD" -->
+  <constant name="struts.ui.theme" value="simple" />
+  
+  <!-- Define Spring Factory and cache -->
+  <constant name="struts.objectFactory" value="spring" />
+  <constant name="struts.objectFactory.spring.useClassCache" value="false" />  
+  
+
+  <package name="user" extends="struts-default">
+    <action name="" class="loginAction" method="unspecified">
+      <result name="input">/WEB-INF/login.jsp</result>
+    </action> 
+      
+    <action name="login" class="loginAction" method="findContact">
+      <result name="input">/WEB-INF/login.jsp</result>
+      <result name="success" type="redirect">viewDailyReports.action</result>
+	  <result name="error">/WEB-INF/login.jsp</result>
+    </action> 
+    
+     <action name="loginOut" class="loginAction" method="loginOut">
+      <result name="input">/WEB-INF/login.jsp</result>
+    </action>    
+    
+    <action name="viewDailyReports" class="dailyReportAction" method="unspecified">
+      <result name="input">/WEB-INF/login.jsp</result>
+      <result name="success">/WEB-INF/pages/main.jsp</result>
+	  <result name="error">/WEB-INF/login.jsp</result>
+    </action> 
+    
+    <action name="forwardUpdateDailyReport" class="dailyReportAction" method="forwardUpdateDailyReport">
+      <result name="input">/WEB-INF/pages/dailyReports/updateDailyReport.jsp</result>
+    </action>  
+    
+    <action name="updateDailyReport" class="dailyReportAction" method="updateDailyReport">
+      <result name="input">/WEB-INF/pages/dailyReports/updateDailyReport.jsp</result>
+      <result name="success" type="redirect">viewDailyReports.action</result>
+      <result name="error">/WEB-INF/pages/dailyReports/updateDailyReport.jsp</result>
+    </action>
+    
+    <action name="deleteDailyReport" class="dailyReportAction" method="deleteDailyReport">
+      <result name="input" type="redirect">viewDailyReports.action</result>
+      <result name="error">/WEB-INF/pages/main.jsp</result>
+      <result name="success" type="redirect">viewDailyReports.action</result>
+    </action> 
+    
+    <action name="viewCustomers" class="customerAction" method="unspecified">
+      <result name="input">/WEB-INF/login.jsp</result>
+      <result name="success">/WEB-INF/pages/customers/viewCustomers.jsp</result>
+	  <result name="error">/WEB-INF/login.jsp</result>
+    </action> 
+    
+    <action name="forwardUpdateCustomer" class="customerAction" method="forwardUpdateCustomer">
+      <result name="input">/WEB-INF/pages/customers/updateCustomer.jsp</result>
+    </action>
+
+    <action name="updateCustomer" class="customerAction" method="updateCustomer">
+      <result name="input" >/WEB-INF/pages/customers/updateCustomer.jsp</result>
+      <result name="success" type="redirect">viewCustomers.action</result>
+      <result name="error">/WEB-INF/pages/customers/updateCustomer.jsp</result>
+    </action>
+    
+    <action name="deleteCustomer" class="customerAction" method="deleteCustomer">
+      <result name="input" type="redirect">viewCustomers.action</result>
+      <result name="error">/WEB-INF/pages/customers/viewCustomers.jsp</result>
+      <result name="success" type="redirect">viewCustomers.action</result>
+    </action> 
+    
+    <action name="viewContacts" class="userAction" method="unspecified">
+      <result name="input">/WEB-INF/login.jsp</result>
+      <result name="success">/WEB-INF/pages/users/viewUsers.jsp</result>
+	  <result name="error">/WEB-INF/login.jsp</result>
+    </action> 
+
+    <action name="forwardUpdateContact" class="userAction" method="forwardUpdateUser">
+      <result name="input">/WEB-INF/pages/users/updateUser.jsp</result>
+    </action>
+    
+    <action name="updateContact" class="userAction" method="updateUser">
+      <result name="input">/WEB-INF/pages/users/updateUser.jsp</result>
+      <result name="success" type="redirect">viewContacts.action</result>
+      <result name="error">/WEB-INF/pages/users/updateUser.jsp</result>
+    </action>
+    
+    <action name="deleteContact" class="userAction" method="deleteUser">
+      <result name="input" type="redirect">viewContacts.action</result>
+      <result name="error">/WEB-INF/pages/users/viewUsers.jsp</result>
+      <result name="success" type="redirect">viewContacts.action</result>
+    </action> 
+    
+    <action name="viewCustomerContacts" class="customerContactAction" method="unspecified">
+      <result name="input">/WEB-INF/login.jsp</result>
+      <result name="success">/WEB-INF/pages/customers/viewCustomerContacts.jsp</result>
+	  <result name="error">/WEB-INF/login.jsp</result>
+    </action> 
+    
+    <action name="forwardUpdateCustomerContact" class="customerContactAction" method="forwardUpdateCustomerContact">
+      <result name="input">/WEB-INF/pages/customers/updateCustomerContact.jsp</result>
+    </action>
+
+    <action name="updateCustomerContact" class="customerContactAction" method="updateCustomerContact">
+      <result name="input" >/WEB-INF/pages/customers/updateCustomerContact.jsp</result>
+      <result name="success">/WEB-INF/pages/autoClose.jsp</result>
+      <result name="error">/WEB-INF/pages/customers/updateCustomerContact.jsp</result>
+    </action>
+    
+    <action name="deleteCustomerContact" class="customerContactAction" method="deleteCustomerContact">
+      <result name="input">/WEB-INF/pages/autoClose.jsp</result>
+      <result name="error">/WEB-INF/pages/customers/viewCustomerContacts.jsp</result>
+      <result name="success">/WEB-INF/pages/autoClose.jsp</result>
+    </action>   
+    
+    <action name="viewCustomerProjects" class="customerProjectAction" method="unspecified">
+      <result name="input">/WEB-INF/login.jsp</result>
+      <result name="success">/WEB-INF/pages/customers/viewCustomerProjects.jsp</result>
+	  <result name="error">/WEB-INF/login.jsp</result>
+    </action> 
+    
+    <action name="forwardUpdateCustomerProject" class="customerProjectAction" method="forwardUpdateCustomerProject">
+      <result name="input">/WEB-INF/pages/customers/updateCustomerProject.jsp</result>
+    </action>
+
+    <action name="updateCustomerProject" class="customerProjectAction" method="updateCustomerProject">
+      <result name="input" >/WEB-INF/pages/customers/updateCustomerProject.jsp</result>
+      <result name="success">/WEB-INF/pages/autoClose.jsp</result>
+      <result name="error">/WEB-INF/pages/customers/updateCustomerProject.jsp</result>
+    </action>
+    
+    <action name="deleteCustomerProject" class="customerProjectAction" method="deleteCustomerProject">
+      <result name="input">/WEB-INF/pages/autoClose.jsp</result>
+      <result name="error">/WEB-INF/pages/customers/viewCustomerProjects.jsp</result>
+      <result name="success">/WEB-INF/pages/autoClose.jsp</result>
+    </action>              
+                   
+  </package>
+
+</struts>

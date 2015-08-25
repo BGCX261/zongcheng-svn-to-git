@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+    
+<sqlMap namespace="CustomerProject">
+	<typeAlias alias="customerProject" type="com.zcmng.models.CustomerProject"/>
+
+	<resultMap class="customerProject" id="customerProjectResult">
+	  <result property="id" column="id"/>
+	  <result property="customerId" column="customerId"/>	  
+	  <result property="projectRequirement" column="projectRequirement"/>
+	  <result property="productRequirement" column="productRequirement"/>
+	  <result property="price" column="price" nullValue="0.0"/>
+	  <result property="competition" column="competition"/>
+	  <result property="competitionPrice" column="competitionPrice" nullValue="0.0"/>
+	  <result property="communicationDate" column="communicationDate"/>
+	  <result property="communicationNotes" column="communicationNotes"/>
+	  <result property="createDate" column="createDate"/>
+	  <result property="modifyDate" column="modifyDate"/>
+	</resultMap>
+	
+	<!-- Define Cache -->
+	<cacheModel type="OSCACHE" id="customerProjectCache">
+	  <flushInterval hours="12"/>
+	  <flushOnExecute statement="CustomerProject.insert"/>
+	  <flushOnExecute statement="CustomerProject.update"/>
+	  <flushOnExecute statement="CustomerProject.delete"/> 	  
+	</cacheModel>
+	
+	<!-- Insert method -->
+    <insert id="insert" parameterClass="customerProject">
+    	<![CDATA[ 
+   		INSERT INTO customerProject 
+	  	( customerId,
+		  projectRequirement,
+		  productRequirement,
+		  price,
+		  competition,
+		  competitionPrice,
+		  communicationDate,
+		  communicationNotes)	  	
+   		VALUES ( #customerId,jdbcType=NUMERIC#,
+		  #projectRequirement,jdbcType=VARCHAR#,
+		  #productRequirement,jdbcType=VARCHAR#,
+		  #price,jdbcType=FLOAT#,
+		  #competition,jdbcType=VARCHAR#,
+		  #competitionPrice,jdbcType=FLOAT#,
+		  #communicationDate,jdbcType=VARCHAR#,
+		  #communicationNotes,jdbcType=VARCHAR#)    	
+    	]]>
+    	<selectKey resultClass="int" keyProperty="id">
+	     	<![CDATA[ 
+			SELECT @@IDENTITY AS ID 
+	    	]]>   	
+    	</selectKey>
+	</insert>	
+	
+	<!-- Update method -->
+	<update id="update" parameterClass="customerProject">
+		<![CDATA[
+		UPDATE customerProject SET modifyDate = getDate()
+		]]>
+		<isNotEmpty property="customerId" prepend=",">
+		  customerId = #customerId,jdbcType=NUMERIC#
+		</isNotEmpty>
+		<isNotEmpty property="projectRequirement" prepend=",">
+		  projectRequirement = #projectRequirement,jdbcType=VARCHAR#
+		</isNotEmpty>		
+		<isNotEmpty property="productRequirement" prepend=",">
+		  productRequirement = #productRequirement,jdbcType=VARCHAR#
+		</isNotEmpty>
+		<isNotEmpty property="price" prepend=",">
+		  price = #price,jdbcType=FLOAT#
+		</isNotEmpty>		
+		<isNotEmpty property="competition" prepend=",">
+		  competition = #competition,jdbcType=VARCHAR#
+		</isNotEmpty>
+		<isNotEmpty property="competitionPrice" prepend=",">
+		  competitionPrice = #competitionPrice,jdbcType=FLOAT#
+		</isNotEmpty>		
+		<isNotEmpty property="communicationDate" prepend=",">
+		  communicationDate = #communicationDate,jdbcType=VARCHAR#
+		</isNotEmpty>		
+		<isNotEmpty property="communicationNotes" prepend=",">
+		  communicationNotes = #communicationNotes,jdbcType=VARCHAR#
+		</isNotEmpty>
+		WHERE id = #id,jdbcType=NUMERIC#	
+	</update>		
+	
+	<!-- Delete method -->
+	<delete id="delete" parameterClass="map">
+		<![CDATA[
+		DELETE FROM customerProject
+		]]>
+		<dynamic prepend="WHERE">
+			<isNotEmpty property="customerProjectIds">
+				id in 
+				<iterate conjunction="," open="(" close=")" property="customerProjectIds">
+					#customerProjectIds[]#
+				</iterate>
+			</isNotEmpty>
+		</dynamic>		
+	</delete>	
+	
+	<!-- Find customerProject by Id -->
+	<select id="findCustomerProjectById" resultMap="customerProjectResult" parameterClass="int" cacheModel="customerProjectCache">
+		<![CDATA[
+		SELECT cp.id, 
+		cp.customerId, 
+		cp.projectRequirement,
+		cp.productRequirement,
+		cp.price,
+		cp.competition,
+		cp.competitionPrice,
+		cp.communicationDate,
+		cp.communicationNotes,	
+		cp.createDate, 
+		cp.modifyDate 
+		FROM customerProject cp WHERE cp.id = #value#
+		]]>		
+	</select>	
+	
+	<!-- Find some customerProjects by customerId -->
+	<select id="findCustomerProjectsByCustomerId" resultMap="customerProjectResult" parameterClass="int" cacheModel="customerProjectCache">
+		<![CDATA[
+		SELECT cp.id, 
+		cp.customerId, 
+		cp.projectRequirement,
+		cp.productRequirement,
+		cp.price,
+		cp.competition,
+		cp.competitionPrice,
+		cp.communicationDate,
+		cp.communicationNotes,	
+		cp.createDate, 
+		cp.modifyDate 
+		FROM customerProject cp WHERE cp.customerId = #value#
+		]]>		
+	</select>	
+</sqlMap>

@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+    
+<sqlMap namespace="DailyReport">
+	<typeAlias alias="dailyReport" type="com.zcmng.models.DailyReport"/>
+
+	<resultMap class="dailyReport" id="reportResult">
+	  <result property="id" column="id"/>
+	  <result property="user" column="userId" select="Contact.findContactById"/>
+	  <result property="customer" column="customerId" select="Customer.findCustomerById"/>
+	  <result property="task" column="task"/>
+	  <result property="notes" column="notes"/>	 
+	  <result property="publishDate" column="publishDate"/> 
+	  <result property="createDate" column="createDate"/>
+	  <result property="modifyDate" column="modifyDate"/>
+	</resultMap>
+	
+	<!-- Define Cache -->
+	<cacheModel type="OSCACHE" id="dailyReportCache">
+	  <flushInterval hours="12"/>
+	  <flushOnExecute statement="Contact.insert"/>
+	  <flushOnExecute statement="Contact.update"/>
+	  <flushOnExecute statement="Contact.delete"/>	
+	  <flushOnExecute statement="Contact.deleteContactByIds"/>  
+	  <flushOnExecute statement="Customer.insert"/>
+	  <flushOnExecute statement="Customer.update"/>
+	  <flushOnExecute statement="Customer.delete"/>
+	  <flushOnExecute statement="Customer.deleteCustomerByIds"/>
+	  <flushOnExecute statement="DailyReport.insert"/>
+	  <flushOnExecute statement="DailyReport.update"/>
+	  <flushOnExecute statement="DailyReport.delete"/>
+	  <flushOnExecute statement="DailyReport.deleteDailyReportByIds"/>	  	  
+	</cacheModel>	
+	
+	<!-- Insert method -->
+    <insert id="insert" parameterClass="dailyReport">
+    	<![CDATA[ 
+   		INSERT INTO dailyReport 
+	  	(   userId,
+	   		customerId,
+	   		task,
+	   		notes,
+	   		publishDate )
+   		VALUES (#user.id,jdbcType=NUMERIC#,
+	   		#customer.id,jdbcType=NUMERIC#,
+	   		#task,jdbcType=VARCHAR#,
+	   		#notes,jdbcType=VARCHAR#,
+	   		#publishDate,jdbcType=VARCHAR# )    	
+    	]]>
+    	<selectKey resultClass="int" keyProperty="id">
+	     	<![CDATA[ 
+			SELECT @@IDENTITY AS ID 
+	    	]]>   	
+    	</selectKey>
+	</insert>	
+	
+	<!-- Update method -->
+	<update id="update" parameterClass="dailyReport">
+		<![CDATA[
+		UPDATE dailyReport SET modifyDate = getDate()
+		]]>
+		<isNotEmpty property="customer" prepend=",">
+		  customerId = #customer.id,jdbcType=VARCHAR#
+		</isNotEmpty>
+		<isNotEmpty property="task" prepend=",">
+		  task = #task,jdbcType=VARCHAR#
+		</isNotEmpty>
+		<isNotEmpty property="notes" prepend=",">
+		  notes = #notes,jdbcType=VARCHAR#
+		</isNotEmpty>
+		<isNotEmpty property="publishDate" prepend=",">
+		  publishDate = #publishDate,jdbcType=VARCHAR#
+		</isNotEmpty>				
+		WHERE id = #id,jdbcType=NUMERIC#	
+	</update>	
+	
+	<!-- Delete method -->
+	<delete id="delete" parameterClass="dailyReport">
+		<![CDATA[
+		DELETE FROM dailyReport WHERE id = #id,jdbcType=NUMERIC#
+		]]>
+	</delete>
+
+	<!-- Delete method -->
+	<delete id="deleteDailyReportByIds" parameterClass="map">
+		<![CDATA[
+		DELETE FROM dailyReport 
+		]]>
+		<dynamic prepend="WHERE">
+			<isNotEmpty property="dailyReportIds">
+				id in 
+				<iterate conjunction="," open="(" close=")" property="dailyReportIds">
+					#dailyReportIds[]#
+				</iterate>
+			</isNotEmpty>
+		</dynamic>
+	</delete>
+	
+	<!-- Find dailyReport by Id -->
+	<select id="findDailyReportById" resultMap="reportResult" parameterClass="int" cacheModel="dailyReportCache">
+		<![CDATA[
+		SELECT dr.id, dr.userId, dr.customerId, dr.task, dr.notes, dr.publishDate, dr.createDate, dr.modifyDate 
+		FROM dailyReport dr WHERE dr.id = #value#
+		]]>		
+	</select>	
+	
+	<!-- Find user by conditions -->
+	<select id="findDailyReportsByCondition" resultMap="reportResult" parameterClass="map" cacheModel="dailyReportCache">
+		<![CDATA[
+		SELECT *
+		FROM (
+		  SELECT ROW_NUMBER() OVER (ORDER BY id) AS RowNumber, * 
+		  FROM (		
+		    SELECT dr.id, dr.userId, dr.customerId, dr.task, dr.notes, dr.publishDate, dr.createDate, dr.modifyDate 
+		      FROM dailyReport dr 		  
+		]]>	
+		<dynamic prepend="WHERE">
+			<isNotEmpty property="userId" prepend="AND">
+			  dr.userId = #userId,jdbcType=NUMERIC#
+			</isNotEmpty>
+			<isNotEmpty property="customerId" prepend="AND">
+			  dr.customerId = #customerId,jdbcType=VARCHAR#
+			</isNotEmpty>	
+			<isNotEmpty property="task" prepend="AND">
+			  dr.task like '%$task$%'
+			</isNotEmpty>
+			<isNotEmpty property="notes" prepend="AND">
+			  dr.notes like '%$notes$%'
+			</isNotEmpty>	
+			<isNotEmpty property="publishDate" prepend="AND">
+			  dr.publishDate = #publishDate,jdbcType=VARCHAR#
+			</isNotEmpty>			
+			<isNotEmpty property="createDate" prepend="AND">
+			  dr.createDate = #createDate,jdbcType=VARCHAR#
+			</isNotEmpty>
+			<isNotEmpty property="modifyDate" prepend="AND">
+			  dr.modifyDate = #modifyDate,jdbcType=VARCHAR#
+			</isNotEmpty>												
+		</dynamic>
+		<![CDATA[	
+		    ) temp
+		  ) pageTable
+		  WHERE RowNumber between #pageStart,jdbcType=NUMERIC# and #pageEnd,jdbcType=NUMERIC#
+		]]>				
+	</select>	
+	
+    <!-- Get users count For Pagination -->
+    <select id="getDailyReportCountByConditions" resultClass="int" parameterClass="map" cacheModel="dailyReportCache">
+ 		<![CDATA[
+		SELECT count(*) as value FROM dailyReport 
+		]]>	
+		<dynamic prepend="WHERE">
+			<isNotEmpty property="userId" prepend="AND">
+			  userId = #userId,jdbcType=NUMERIC#
+			</isNotEmpty>
+			<isNotEmpty property="customerId" prepend="AND">
+			  customerId = #customerId,jdbcType=VARCHAR#
+			</isNotEmpty>	
+			<isNotEmpty property="task" prepend="AND">
+			  task like '%$task$%'
+			</isNotEmpty>
+			<isNotEmpty property="notes" prepend="AND">
+			  notes like '%$notes$%'
+			</isNotEmpty>
+			<isNotEmpty property="publishDate" prepend="AND">
+			  publishDate = #publishDate,jdbcType=VARCHAR#
+			</isNotEmpty>				
+			<isNotEmpty property="createDate" prepend="AND">
+			  createDate = #createDate,jdbcType=VARCHAR#
+			</isNotEmpty>
+			<isNotEmpty property="modifyDate" prepend="AND">
+			  modifyDate = #modifyDate,jdbcType=VARCHAR#
+			</isNotEmpty>												
+		</dynamic>	   
+    </select>				
+</sqlMap>

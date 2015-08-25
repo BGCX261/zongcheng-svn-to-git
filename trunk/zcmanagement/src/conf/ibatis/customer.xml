@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+    
+<sqlMap namespace="Customer">
+	<typeAlias alias="customer" type="com.zcmng.models.Customer"/>
+
+	<resultMap class="customer" id="customerResult">
+	  <result property="id" column="id"/>
+	  <result property="companyName" column="companyName"/>	  
+	  <result property="attribute" column="attribute"/>
+	  <result property="region" column="region"/>
+	  <result property="field" column="field"/>
+	  <result property="major" column="major"/>
+	  <result property="address" column="address"/>
+	  <result property="url" column="url"/>
+	  <result property="customerContacts" column="id" select="CustomerContact.findCustomerContactsByCustomerId"/>
+	  <result property="customerProjects" column="id" select="CustomerProject.findCustomerProjectsByCustomerId"/>
+	  <result property="orderCount" column="orderCount" nullValue="0"/>
+	  <result property="orderMoney" column="orderMoney" nullValue="0.0"/>
+	  <result property="paymentWay" column="paymentWay"/>
+	  <result property="creditLevel" column="creditLevel"/>
+	  <result property="owner" column="ownerId" select="Contact.findContactById"/>  
+	  <result property="createDate" column="createDate"/>
+	  <result property="modifyDate" column="modifyDate"/>
+	</resultMap>
+	
+	<!-- Define Cache -->
+	<cacheModel type="OSCACHE" id="customerCache">
+	  <flushInterval hours="12"/>
+	  <flushOnExecute statement="Customer.insert"/>
+	  <flushOnExecute statement="Customer.update"/>
+	  <flushOnExecute statement="Customer.delete"/>
+	  <flushOnExecute statement="Customer.deleteCustomerByIds"/>
+	  <flushOnExecute statement="CustomerContact.insert"/>
+	  <flushOnExecute statement="CustomerContact.update"/>
+	  <flushOnExecute statement="CustomerContact.delete"/>	 
+	  <flushOnExecute statement="CustomerProject.insert"/>
+	  <flushOnExecute statement="CustomerProject.update"/>
+	  <flushOnExecute statement="CustomerProject.delete"/> 	 	   	  
+	</cacheModel>
+	
+	<!-- Insert method -->
+    <insert id="insert" parameterClass="customer">
+    	<![CDATA[ 
+   		INSERT INTO customer 
+	  	( companyName,
+		  attribute,
+		  region,
+		  field,
+		  major,
+		  address,
+		  url,
+		  orderCount,
+		  orderMoney,
+		  paymentWay,
+		  creditLevel,
+		  ownerId)	  	
+   		VALUES ( #companyName,jdbcType=VARCHAR#,
+		  #attribute,jdbcType=VARCHAR#,
+		  #region,jdbcType=VARCHAR#,
+		  #field,jdbcType=VARCHAR#,
+		  #major,jdbcType=VARCHAR#,
+		  #address,jdbcType=VARCHAR#,
+		  #url,jdbcType=VARCHAR#,
+		  #orderCount,jdbcType=NUMERIC#,
+		  #orderMoney,jdbcType=FLOAT#,
+		  #paymentWay,jdbcType=VARCHAR#,
+		  #creditLevel,jdbcType=VARCHAR#,
+		  #owner.id,jdbcType=NUMERIC#)    	
+    	]]>
+    	<selectKey resultClass="int" keyProperty="id">
+	     	<![CDATA[ 
+			SELECT @@IDENTITY AS ID 
+	    	]]>   	
+    	</selectKey>
+	</insert>	
+	
+	<!-- Update method -->
+	<update id="update" parameterClass="customer">
+		<![CDATA[
+		UPDATE customer SET modifyDate = getDate()
+		]]>
+		<isNotEmpty property="companyName" prepend=",">
+		  companyName = #companyName,jdbcType=VARCHAR#
+		</isNotEmpty>
+		<isNotEmpty property="attribute" prepend=",">
+		  attribute = #attribute,jdbcType=VARCHAR#
+		</isNotEmpty>		
+		<isNotEmpty property="region" prepend=",">
+		  region = #region,jdbcType=VARCHAR#
+		</isNotEmpty>		
+		<isNotEmpty property="field" prepend=",">
+		  field = #field,jdbcType=VARCHAR#
+		</isNotEmpty>
+		<isNotEmpty property="major" prepend=",">
+		  major = #major,jdbcType=VARCHAR#
+		</isNotEmpty>		
+		<isNotEmpty property="address" prepend=",">
+		  address = #address,jdbcType=VARCHAR#
+		</isNotEmpty>		
+		<isNotEmpty property="url" prepend=",">
+		  url = #url,jdbcType=VARCHAR#
+		</isNotEmpty>
+		<isNotEmpty property="orderCount" prepend=",">
+		  orderCount = #orderCount,jdbcType=NUMERIC#
+		</isNotEmpty>		
+		<isNotEmpty property="orderMoney" prepend=",">
+		  orderMoney = #orderMoney,jdbcType=FLOAT#
+		</isNotEmpty>		
+		<isNotEmpty property="paymentWay" prepend=",">
+		  paymentWay = #paymentWay,jdbcType=VARCHAR#
+		</isNotEmpty>
+		<isNotEmpty property="creditLevel" prepend=",">
+		  creditLevel = #creditLevel,jdbcType=VARCHAR#
+		</isNotEmpty>		
+		<isNotEqual property="disable" compareValue="0" prepend=",">
+		  disabled = #disable,jdbcType=NUMERIC#
+		</isNotEqual>
+		WHERE id = #id,jdbcType=NUMERIC#	
+	</update>		
+	
+	<!-- Delete method -->
+	<delete id="delete" parameterClass="map">
+		<![CDATA[
+		DELETE FROM customer WHERE id = #id,jdbcType=NUMERIC#
+		]]>
+		<dynamic prepend="WHERE">
+			<isNotEmpty property="customerIds">
+				id in 
+				<iterate conjunction="," open="(" close=")" property="customerIds">
+					#customerIds[]#
+				</iterate>
+			</isNotEmpty>
+		</dynamic>		
+	</delete>
+	
+	<!-- Delete method -->
+	<delete id="deleteCustomerByIds" parameterClass="map">
+		<![CDATA[
+		update customer SET disabled = 1  
+		]]>
+		<dynamic prepend="WHERE">
+			<isNotEmpty property="customerIds">
+				id in 
+				<iterate conjunction="," open="(" close=")" property="customerIds">
+					#customerIds[]#
+				</iterate>
+			</isNotEmpty>
+		</dynamic>
+	</delete>		
+	
+	<!-- Find customer by Id -->
+	<select id="findCustomerById" resultMap="customerResult" parameterClass="int" cacheModel="customerCache">
+		<![CDATA[
+		SELECT co.id, 
+		co.companyName, 
+		co.attribute,
+		co.region,
+		co.field,
+		co.major,
+		co.address,
+		co.url,
+		co.orderCount,
+		co.orderMoney,
+		co.paymentWay,
+		co.creditLevel,	
+		co.ownerId,	
+		co.createDate, 
+		co.modifyDate 
+		FROM customer co WHERE co.id = #value#
+		]]>		
+	</select>	
+	
+	<!-- Find user by conditions -->
+	<select id="findAllCustomers" resultMap="customerResult" parameterClass="map" cacheModel="customerCache">
+		<![CDATA[
+		    SELECT co.id,
+		    co.companyName,
+			co.attribute,
+			co.region,
+			co.field,
+			co.major,
+			co.address,
+			co.url,
+			co.orderCount,
+			co.orderMoney,
+			co.paymentWay,
+			co.creditLevel,	
+			co.ownerId,		     
+		    co.createDate, 
+		    co.modifyDate 
+	      FROM customer co 
+	     WHERE co.disabled = 0		  
+		]]>	
+		<dynamic>
+			<isNotEmpty property="companyName" prepend="AND">
+			  co.companyName like '%$companyName$%'
+			</isNotEmpty>
+			<isNotNull property="owner" prepend="AND">
+			  co.ownerId = #owner.id,jdbcType=NUMERIC#
+			</isNotNull>			
+		</dynamic>	
+	</select>
+
+	<!-- Find user by conditions -->
+	<select id="findCustomersByCondition" resultMap="customerResult" parameterClass="map" cacheModel="customerCache">
+		<![CDATA[
+		SELECT *
+		FROM (
+		  SELECT ROW_NUMBER() OVER (ORDER BY id) AS RowNumber, * 
+		  FROM (			
+		    SELECT co.id, 
+		    co.companyName,
+			co.attribute,
+			co.region,
+			co.field,
+			co.major,
+			co.address,
+			co.url,
+			co.orderCount,
+			co.orderMoney,
+			co.paymentWay,
+			co.creditLevel,
+			co.ownerId,		     
+		    co.createDate, 
+		    co.modifyDate 
+	      FROM customer co 
+	     WHERE co.disabled = 0		  
+		]]>	
+		<dynamic>
+			<isNotEmpty property="companyName" prepend="AND">
+			  co.companyName like '%$companyName$%'
+			</isNotEmpty>
+			<isNotNull property="owner" prepend="AND">
+			  co.ownerId = #owner.id,jdbcType=NUMERIC#
+			</isNotNull>			
+		</dynamic>	
+		<![CDATA[	
+		    ) temp
+		  ) pageTable
+		  WHERE RowNumber between #pageStart,jdbcType=NUMERIC# and #pageEnd,jdbcType=NUMERIC#
+		]]>			
+	</select>	
+	
+    <!-- Get users count For Pagination -->
+    <select id="getCustomerCountByConditions" resultClass="int" parameterClass="map" cacheModel="customerCache">
+ 		<![CDATA[
+		SELECT count(*) as value FROM customer WHERE disabled = 0
+		]]>	
+		<dynamic>
+			<isNotEmpty property="companyName" prepend="AND">
+			  companyName like '%$companyName$%'
+			</isNotEmpty>
+			<isNotNull property="owner" prepend="AND">
+			  ownerId = #owner.id,jdbcType=NUMERIC#
+			</isNotNull>			
+		</dynamic>	   
+    </select>		
+</sqlMap>

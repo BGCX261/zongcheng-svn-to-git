@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+    
+<sqlMap namespace="CustomerContact">
+	<typeAlias alias="customerContact" type="com.zcmng.models.CustomerContact"/>
+
+	<resultMap class="customerContact" id="customerContactResult">
+	  <result property="id" column="id"/>
+	  <result property="customerId" column="customerId"/>	  
+	  <result property="contact" column="contact"/>
+	  <result property="position" column="position"/>
+	  <result property="telephone" column="telephone"/>
+	  <result property="fax" column="fax"/>
+	  <result property="mobile" column="mobile"/>
+	  <result property="email" column="email"/>
+	  <result property="purchaseRole" column="purchaseRole"/>
+	  <result property="createDate" column="createDate"/>
+	  <result property="modifyDate" column="modifyDate"/>
+	</resultMap>
+	
+	<!-- Define Cache -->
+	<cacheModel type="OSCACHE" id="customerContactCache">
+	  <flushInterval hours="12"/>
+	  <flushOnExecute statement="CustomerContact.insert"/>
+	  <flushOnExecute statement="CustomerContact.update"/>
+	  <flushOnExecute statement="CustomerContact.delete"/>
+	</cacheModel>
+	
+	<!-- Insert method -->
+    <insert id="insert" parameterClass="customerContact">
+    	<![CDATA[ 
+   		INSERT INTO customerContact 
+	  	( customerId,
+		  contact,
+		  position,
+		  telephone,
+		  fax,
+		  mobile,
+		  email,
+		  purchaseRole)	  	
+   		VALUES ( #customerId,jdbcType=NUMERIC#,
+		  #contact,jdbcType=VARCHAR#,
+		  #position,jdbcType=VARCHAR#,
+		  #telephone,jdbcType=VARCHAR#,
+		  #fax,jdbcType=VARCHAR#,
+		  #mobile,jdbcType=VARCHAR#,
+		  #email,jdbcType=VARCHAR#,
+		  #purchaseRole,jdbcType=VARCHAR#)    	
+    	]]>
+    	<selectKey resultClass="int" keyProperty="id">
+	     	<![CDATA[ 
+			SELECT @@IDENTITY AS ID 
+	    	]]>   	
+    	</selectKey>
+	</insert>	
+	
+	<!-- Update method -->
+	<update id="update" parameterClass="customerContact">
+		<![CDATA[
+		UPDATE customerContact SET modifyDate = getDate()
+		]]>
+		<isNotEmpty property="customerId" prepend=",">
+		  customerId = #customerId,jdbcType=NUMERIC#
+		</isNotEmpty>
+		<isNotEmpty property="contact" prepend=",">
+		  contact = #contact,jdbcType=VARCHAR#
+		</isNotEmpty>		
+		<isNotEmpty property="position" prepend=",">
+		  position = #position,jdbcType=VARCHAR#
+		</isNotEmpty>		  
+		<isNotEmpty property="telephone" prepend=",">
+		  telephone = #telephone,jdbcType=VARCHAR#
+		</isNotEmpty>
+		<isNotEmpty property="fax" prepend=",">
+		  fax = #fax,jdbcType=VARCHAR#
+		</isNotEmpty>		
+		<isNotEmpty property="mobile" prepend=",">
+		  mobile = #mobile,jdbcType=VARCHAR#
+		</isNotEmpty>		
+		<isNotEmpty property="email" prepend=",">
+		  email = #email,jdbcType=VARCHAR#
+		</isNotEmpty>
+		<isNotEmpty property="purchaseRole" prepend=",">
+		  purchaseRole = #purchaseRole,jdbcType=VARCHAR#
+		</isNotEmpty>		
+		WHERE id = #id,jdbcType=NUMERIC#	
+	</update>		
+	
+	<!-- Delete method -->
+	<delete id="delete" parameterClass="map">
+		<![CDATA[
+		DELETE FROM customerContact
+		]]>
+		<dynamic prepend="WHERE">
+			<isNotEmpty property="customerConatctIds">
+				id in 
+				<iterate conjunction="," open="(" close=")" property="customerConatctIds">
+					#customerConatctIds[]#
+				</iterate>
+			</isNotEmpty>
+		</dynamic>		
+	</delete>
+	
+	<!-- Find customerContact by Id -->
+	<select id="findCustomerContactById" resultMap="customerContactResult" parameterClass="int" cacheModel="customerContactCache">
+		<![CDATA[
+		SELECT cc.id, 
+		cc.customerId, 
+		cc.contact,
+		cc.position,
+		cc.telephone,
+		cc.fax,
+		cc.mobile,
+		cc.email,
+		cc.purchaseRole,		
+		cc.createDate, 
+		cc.modifyDate 
+		FROM customerContact cc WHERE cc.id = #value#
+		]]>		
+	</select>
+	
+	<!-- Find some CustomerContacts by customerId -->
+	<select id="findCustomerContactsByCustomerId" resultMap="customerContactResult" parameterClass="int" cacheModel="customerContactCache">
+		<![CDATA[
+		SELECT cc.id, 
+		cc.customerId, 
+		cc.contact,
+		cc.position,
+		cc.telephone,
+		cc.fax,
+		cc.mobile,
+		cc.email,
+		cc.purchaseRole,		
+		cc.createDate, 
+		cc.modifyDate 
+		FROM customerContact cc WHERE cc.customerId = #value#
+		]]>		
+	</select>		
+</sqlMap>

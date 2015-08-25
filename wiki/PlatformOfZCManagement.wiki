@@ -1,0 +1,25 @@
+_[http://code.google.com/p/zongcheng 回到主页]_
+<br/>
+_[JavaProjects 回到上层]_
+
+==开发平台==
+1. Windows XP/7 <br/>
+2. [JDK JDK 1.5] <br/>
+3. [Ant Ant 1.7] <br/>
+
+==使用框架==
+1. Struts 2.0 <br/>
+2. Spring 2.5.5 <br/>
+3. Ibatis 2.3.4 <br/>
+
+==数据库==
+1. SQL Server 2005 <br/>
+
+==Web服务器==
+1. Tomcat 6
+
+==开发工具==
+1. Eclipse 3.6(Helios) <br/>
+
+==版本控制==
+1. SVN -- Google Code <br/>
